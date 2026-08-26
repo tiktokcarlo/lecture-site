@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player — LectureStream</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>▶️</text></svg>" />
+</head>
+<body class="player-body">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-logo">▶</span>
+        <span class="brand-name">LectureStream</span>
+      </a>
+      <a href="index.html" class="back-link">← Sabhi Lectures</a>
+      <button id="themeToggle" class="theme-btn" title="Dark / Light mode" aria-label="Toggle theme">
+        <span class="theme-icon-sun">☀️</span>
+        <span class="theme-icon-moon">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="player-container">
+    <div class="player-head">
+      <span id="lecNum" class="lec-num-badge">#—</span>
+      <div>
+        <h1 id="lecTitle" class="lec-title">Load ho raha hai…</h1>
+        <p id="lecMeta" class="lec-meta"></p>
+      </div>
+    </div>
+
+    <div class="player-wrap">
+      <video id="video" class="video" controls playsinline preload="metadata"></video>
+      <div id="playerError" class="player-error hidden">
+        ⚠️ Video play nahi ho paaya. Ho sakta hai backend abhi sleep se uth raha ho (free tier) — 30-60 sec wait karke refresh karo.
+        <br/>Agar file MKV hai aur browser support nahi karta, to Chrome/Edge try karo.
+      </div>
+    </div>
+
+    <!-- Playback speed -->
+    <div class="speed-row">
+      <span class="speed-label">⏩ Speed:</span>
+      <div id="speedBtns" class="speed-btns">
+        <button data-speed="0.5">0.5x</button>
+        <button data-speed="0.75">0.75x</button>
+        <button data-speed="1" class="active">1x</button>
+        <button data-speed="1.25">1.25x</button>
+        <button data-speed="1.5">1.5x</button>
+        <button data-speed="1.75">1.75x</button>
+        <button data-speed="2">2x</button>
+      </div>
+    </div>
+
+    <div class="resume-note" id="resumeNote"></div>
+
+    <!-- Prev / Next -->
+    <div class="nav-row">
+      <a id="prevBtn" class="nav-btn hidden" href="#">← <span>#Prev</span></a>
+      <a id="nextBtn" class="nav-btn next hidden" href="#">Next <span>#Next</span> →</a>
+    </div>
+
+    <!-- Up next list -->
+    <section class="upnext-section">
+      <h2 class="section-title">📋 Aage ke Lectures</h2>
+      <div id="upnext" class="upnext-list"></div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/player.js"></script>
+</body>
+</html>
