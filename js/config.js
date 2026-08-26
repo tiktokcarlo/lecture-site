@@ -3,7 +3,7 @@
 window.APP_CONFIG = {
   // backend ka link — trail slash ke BINA.
   // Example: "https://tg-stream-backend-abc123.onrender.com"
-  BACKEND: "",
+  BACKEND: "https://lecture-backend-a6cb.onrender.com",
 
   // videos ki list wali file (isko mat chhedna)
   DATA_URL: "data/videos.json",
