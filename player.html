@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="night">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Play — BERSERK STREAM</title>
+<meta name="theme-color" content="#06060a" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23110a0c'/%3E%3Cg fill='none' stroke='%23ff3243' stroke-width='6' stroke-linecap='round'%3E%3Cpath d='M50 16c6 9 8 17 8 25 0 8-3 13-8 13s-8-5-8-13c0-8 2-16 8-25z'/%3E%3Cpath d='M50 54 26 86M50 54l24 32M32 64h36'/%3E%3C/g%3E%3C/svg%3E" />
+<link rel="stylesheet" href="css/style.css" />
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("bs_theme");
+      document.documentElement.setAttribute("data-theme", t === "dawn" ? "dawn" : "night");
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body class="player-body">
+
+<div class="backdrop"></div>
+<div class="grain"></div>
+<canvas id="embers"></canvas>
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html" aria-label="Berserk Stream home">
+      <span class="brand-mark" id="brandMark"></span>
+      <span class="brand-text">
+        <span class="brand-name">Berserk <b>Stream</b></span>
+        <span class="brand-sub">Now playing</span>
+      </span>
+    </a>
+    <a href="index.html" class="back-link" style="margin-left:auto">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      Saare lectures
+    </a>
+    <button class="icon-btn" id="paletteBtn" title="Command palette (Ctrl/⌘ + K)" aria-label="Command palette">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6.5a2.5 2.5 0 1 0-2.5 2.5H9m0-2.5v11m0-8.5h6m0 0V6a2.5 2.5 0 1 1 2.5 2.5H15m0 0v11M9 17.5A2.5 2.5 0 1 1 6.5 15H9m6 2.5a2.5 2.5 0 1 0 2.5-2.5H15"/></svg>
+    </button>
+    <button class="icon-btn theme-btn" data-theme-toggle title="Theme" aria-label="Toggle theme">
+      <span class="i-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"/></svg></span>
+      <span class="i-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1z"/></svg></span>
+    </button>
+  </div>
+</header>
+
+<main class="player-container">
+  <div class="player-layout">
+
+    <!-- ============ STAGE ============ -->
+    <div>
+      <div class="stage" id="stage">
+        <div class="stage-frame">
+          <video id="video" playsinline preload="metadata"></video>
+
+          <div class="buffer-spin" id="bufferSpin"><i></i></div>
+
+          <div class="center-play" id="centerPlay">
+            <button id="centerPlayBtn" aria-label="Play">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.3-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>
+            </button>
+          </div>
+
+          <div class="player-error" id="playerError">
+            <div>
+              <div class="pe-ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3.5 22 20H2z"/><path d="M12 9.5v4.5M12 17.4h.01"/></svg>
+              </div>
+              <h3 id="peTitle">Video nahi chala</h3>
+              <p id="peBody">Ho sakta hai backend sleep me ho (free tier) — 30-60 second wait karke retry karo. Ya file ka format browser support nahi karta (MKV ho to Chrome/Edge try karo).</p>
+              <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+                <button class="btn btn-blood btn-sm" id="retryBtn">Retry</button>
+                <button class="btn btn-ember btn-sm hidden" id="unlockBtn">Key daalo</button>
+                <a class="btn btn-ghost btn-sm" href="index.html">Home</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- custom controls -->
+          <div class="ctrl-bar" id="ctrlBar">
+            <div class="seek-wrap" id="seekWrap">
+              <div class="seek-track">
+                <div class="seek-buf" id="seekBuf"></div>
+                <div class="seek-play" id="seekPlay"></div>
+              </div>
+              <div class="seek-thumb" id="seekThumb"></div>
+              <div class="seek-tip" id="seekTip">0:00</div>
+            </div>
+            <div class="ctrl-row">
+              <button class="ctrl-btn big" id="ppBtn" aria-label="Play/Pause"></button>
+              <button class="ctrl-btn" id="back10Btn" aria-label="10 second peeche"></button>
+              <button class="ctrl-btn" id="fwd10Btn" aria-label="10 second aage"></button>
+              <button class="ctrl-btn" id="muteBtn" aria-label="Mute"></button>
+              <input id="volInput" type="range" min="0" max="1" step="0.05" value="1" aria-label="Volume"
+                style="width:70px;accent-color:#c1121f;cursor:pointer" />
+              <span class="ctrl-time"><span id="tCur">0:00</span><span class="sep">/</span><span id="tDur">0:00</span></span>
+              <span class="ctrl-spacer"></span>
+              <button class="ctrl-btn" id="speedBtn" aria-label="Playback speed"></button>
+              <button class="ctrl-btn" id="pipBtn" aria-label="Picture in picture"></button>
+              <button class="ctrl-btn" id="theatreBtn" aria-label="Theatre mode"></button>
+              <button class="ctrl-btn" id="fsBtn" aria-label="Fullscreen"></button>
+            </div>
+          </div>
+
+          <div class="speed-pop hidden" id="speedPop">
+            <span class="sp-label">Playback speed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- lecture head -->
+      <div class="lec-head">
+        <div class="lec-kicker">
+          <span class="lec-num" id="lecNum">#—</span>
+          <span class="chip" id="lecBatch" style="background:rgba(232,163,61,.14);color:var(--ember-2);border-color:rgba(232,163,61,.35)">—</span>
+          <span class="chip" id="lecRes">—</span>
+        </div>
+        <h1 class="lec-title" id="lecTitle">Load ho raha hai…</h1>
+        <div class="lec-meta" id="lecMeta"></div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-ghost btn-sm" id="prevBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          <span id="prevLabel">Prev</span>
+        </button>
+        <button class="btn btn-ghost btn-sm" id="nextBtn">
+          <span id="nextLabel">Next</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-sm" id="bmBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3.5h12a1 1 0 0 1 1 1V21l-7-4.2L5 21V4.5a1 1 0 0 1 1-1z"/></svg>
+          <span id="bmLabel">Save</span>
+        </button>
+        <button class="btn btn-ghost btn-sm" id="doneBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>
+          Mark done
+        </button>
+        <button class="btn btn-ghost btn-sm" id="copyBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="9" y="9" width="11.5" height="11.5" rx="2.4"/><path d="M6.5 15H5a1.5 1.5 0 0 1-1.5-1.5V4.5A1.5 1.5 0 0 1 5 3h9a1.5 1.5 0 0 1 1.5 1.5V6"/></svg>
+          Share
+        </button>
+      </div>
+
+      <div id="autoplaySlot"></div>
+
+      <div class="kbd-hints">
+        <span><kbd>space</kbd> play/pause</span>
+        <span><kbd>J</kbd>/<kbd>L</kbd> −/+10s</span>
+        <span><kbd>←</kbd><kbd>→</kbd> −/+5s</span>
+        <span><kbd>↑</kbd><kbd>↓</kbd> volume</span>
+        <span><kbd>F</kbd> fullscreen</span>
+        <span><kbd>M</kbd> mute</span>
+        <span><kbd>T</kbd> theatre</span>
+        <span><kbd>N</kbd> next lecture</span>
+        <span><kbd>0-9</kbd> jump</span>
+      </div>
+    </div>
+
+    <!-- ============ UP NEXT ============ -->
+    <aside class="upnext-panel">
+      <div class="upnext-head">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>
+          Aage kya
+        </h2>
+        <label class="link-btn" style="font-size:11px;cursor:pointer">
+          <input type="checkbox" id="autoplayToggle" style="accent-color:#c1121f" />
+          autoplay
+        </label>
+      </div>
+      <div class="upnext-scroll" id="upnext"></div>
+    </aside>
+  </div>
+</main>
+
+<!-- ============ PALETTE (player me bhi) ============ -->
+<div id="paletteOverlay" class="overlay palette-overlay hidden">
+  <div class="palette" role="dialog" aria-modal="true" aria-label="Command palette">
+    <div class="palette-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <input id="paletteInput" placeholder="Lecture dhoondo ya command likho…" autocomplete="off" spellcheck="false" />
+      <kbd>esc</kbd>
+    </div>
+    <div class="palette-list" id="paletteList"></div>
+    <div class="palette-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> open</span>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/player.js"></script>
+</body>
+</html>

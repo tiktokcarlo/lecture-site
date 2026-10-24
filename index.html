@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="night">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>BERSERK STREAM — Lectures</title>
+<meta name="description" content="Apni tayyari ka maidan. 1300+ lectures, oldest to newest, smooth glass UI. Padho, ladho, jeeto." />
+<meta name="theme-color" content="#06060a" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23110a0c'/%3E%3Cg fill='none' stroke='%23ff3243' stroke-width='6' stroke-linecap='round'%3E%3Cpath d='M50 16c6 9 8 17 8 25 0 8-3 13-8 13s-8-5-8-13c0-8 2-16 8-25z'/%3E%3Cpath d='M50 54 26 86M50 54l24 32M32 64h36'/%3E%3C/g%3E%3C/svg%3E" />
+<link rel="stylesheet" href="css/style.css" />
+<script>
+  /* theme boot — flash of wrong theme se bachne ke liye */
+  (function () {
+    try {
+      var t = localStorage.getItem("bs_theme");
+      document.documentElement.setAttribute("data-theme", t === "dawn" ? "dawn" : "night");
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<div class="backdrop"></div>
+<div class="grain"></div>
+<canvas id="embers"></canvas>
+<div class="sigil" id="sigilSlot"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- ============================ TOPBAR ============================ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html" aria-label="Berserk Stream home">
+      <span class="brand-mark" id="brandMark"></span>
+      <span class="brand-text">
+        <span class="brand-name">Berserk <b>Stream</b></span>
+        <span class="brand-sub">Brand of Sacrifice</span>
+      </span>
+    </a>
+
+    <div class="search-wrap">
+      <span class="search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      </span>
+      <input id="searchInput" type="search" placeholder="Lecture dhoondo — title, batch, ya number (jaise: essay, 47, CSAT)" autocomplete="off" aria-label="Search lectures" />
+      <div class="search-hints" aria-hidden="true"><kbd>/</kbd><kbd id="kbdMod">Ctrl</kbd><kbd>K</kbd></div>
+    </div>
+
+    <button class="icon-btn" id="paletteBtn" title="Command palette (Ctrl/⌘ + K)" aria-label="Open command palette">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6.5a2.5 2.5 0 1 0-2.5 2.5H9m0-2.5v11m0-8.5h6m0 0V6a2.5 2.5 0 1 1 2.5 2.5H15m0 0v11M9 17.5A2.5 2.5 0 1 1 6.5 15H9m6 2.5a2.5 2.5 0 1 0 2.5-2.5H15"/></svg>
+    </button>
+
+    <button class="icon-btn" id="keyBtn" data-open="gate" title="Activation / Premium" aria-label="Activation and premium">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="15.5" r="3.6"/><path d="m10.6 12.9 8.4-8.4M16.4 7.1l2.4 2.4M18.9 4.6l2.4 2.4"/></svg>
+      <span class="dot hidden" id="keyDot"></span>
+    </button>
+
+    <button class="icon-btn theme-btn" data-theme-toggle title="Theme: Night / Golden Age" aria-label="Toggle theme">
+      <span class="i-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"/></svg></span>
+      <span class="i-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1z"/></svg></span>
+    </button>
+  </div>
+</header>
+
+<div id="announce" class="announce hidden"><div class="announce-inner"><span style="display:inline-flex;width:16px;color:var(--ember)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L15 19V5L7.5 9.5z"/><path d="M18.5 9a4 4 0 0 1 0 6"/></svg></span><span id="announceText"></span></div></div>
+
+<main class="container">
+
+  <!-- ============================ HERO ============================ -->
+  <section class="hero" data-reveal>
+    <div class="hero-eyebrow"><span class="live-dot"></span><span>Vajiram &middot; Sunya &middot; GS Foundation &middot; CSAT</span></div>
+    <h1 class="hero-title">
+      Apni tayyari
+      <span class="line-2">ki raakh se</span>
+      empire banao
+    </h1>
+    <p class="hero-sub">
+      <span class="strike">Chaos me bhatakna</span> nahi. <b>Sequence me padho</b> — lecture #1 se aakhri tak,
+      progress khud save hoti hai. Speed control, resume, aur ek search jo sach me kaam karta hai.
+    </p>
+    <div class="hero-stats" id="heroStats">
+      <div class="stat-chip"><span class="n" id="statLectures">…</span><span class="l">Lectures</span></div>
+      <div class="stat-chip"><span class="n" id="statHours">…</span><span class="l">Hours</span></div>
+      <div class="stat-chip"><span class="n" id="statBatches">…</span><span class="l">Batches</span></div>
+      <div class="stat-chip"><span class="n" id="statWatched">0</span><span class="l">Kiye hue</span></div>
+    </div>
+    <div class="action-row" style="margin-top:22px">
+      <button class="btn btn-blood" id="resumeTopBtn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.3-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>
+        <span id="resumeTopLabel">Shuru karo</span>
+      </button>
+      <button class="btn btn-ghost" id="randomBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3.5 4.5h3l11 15h3M3.5 19.5h3l11-15h3"/><path d="M18.5 1.8 21.5 4.5l-3 2.7M18.5 16.8l3 2.7-3 2.7"/></svg>
+        Random lecture
+      </button>
+      <button class="btn btn-ghost" id="unlockCtaBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+        <span id="unlockCtaLabel">Premium unlock</span>
+      </button>
+    </div>
+    <div id="planNote" class="msg info hidden" style="margin-top:14px"></div>
+  </section>
+
+  <!-- ============================ CONTINUE ============================ -->
+  <section id="continueSection" class="hidden" data-reveal>
+    <div class="section-head">
+      <h2 class="section-title">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.3-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>
+        Continue <span class="slash">/</span> Jahan chhoda tha
+      </h2>
+      <button class="link-btn" id="clearProgressBtn">History saaf karo</button>
+    </div>
+    <div class="resume-rail" id="resumeRail"></div>
+  </section>
+
+  <!-- ============================ TOOLBAR ============================ -->
+  <div class="toolbar" id="toolbar">
+    <div class="tabs" role="tablist" aria-label="View filter">
+      <button class="tab active" data-tab="all" role="tab" aria-selected="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg>
+        All
+      </button>
+      <button class="tab" data-tab="progress" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.4V12l3.2 2"/></svg>
+        In progress
+      </button>
+      <button class="tab" data-tab="saved" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3.5h12a1 1 0 0 1 1 1V21l-7-4.2L5 21V4.5a1 1 0 0 1 1-1z"/></svg>
+        Saved <span class="badge hidden" id="savedBadge">0</span>
+      </button>
+    </div>
+
+    <div class="pill-scroller" id="batchPills" aria-label="Batch filter"></div>
+
+    <div class="sort-wrap">
+      <select id="sortSelect" class="select-mini" aria-label="Sort">
+        <option value="oldest">Oldest → Newest</option>
+        <option value="newest">Newest → Oldest</option>
+        <option value="short">Chhote pehle</option>
+        <option value="long">Lambe pehle</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section-head" style="margin-top:6px">
+    <h2 class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 3.5 11 13M20.5 3.5 21 8l-9.5 9.5M20.5 3.5 16 4l-9.5 9.5M5 15l4 4M3.5 20.5 5 15l4 4-1.5 1.5z"/></svg>
+      <span id="listTitle">All lectures</span>
+      <span class="count-pill" id="resultCount">…</span>
+    </h2>
+    <span class="msg info" id="orderHint" style="margin:0">Sequence me padho — #1 se shuru</span>
+  </div>
+
+  <div class="grid" id="grid" aria-live="polite"></div>
+  <div id="statusSlot"></div>
+  <div id="sentinel" class="sentinel"></div>
+  <div id="endSlot"></div>
+</main>
+
+<footer class="footer">
+  <p class="quote">"Wish karne se kuch nahi hota. <em>Talwar uthao</em> aur padho."</p>
+  <p class="fm">BERSERK STREAM &nbsp;•&nbsp; Oldest → Newest &nbsp;•&nbsp; Made for the ones who don't quit</p>
+  <p style="margin-top:10px;opacity:.6">Fan-made study player. Berserk © Kentaro Miura / Studio Gaga.</p>
+</footer>
+
+<!-- ============================ GATE / ACTIVATION DIALOG ============================ -->
+<div id="gateOverlay" class="overlay hidden">
+  <div class="dialog glass-edge" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <button class="dialog-x" data-close="gateOverlay" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="dialog-brand" id="gateBrand"></div>
+    <h2 class="dialog-title" id="gateTitle">Activation <em>chahiye</em></h2>
+    <p class="dialog-sub">Ek key = ek device. Apni <b>Activation Key</b> ya offline-cash <b>SUB voucher</b> yahan daalo.</p>
+
+    <div class="seg">
+      <label><input type="radio" name="keyMode" value="ls" checked /><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" style="width:13px;height:13px"><circle cx="8" cy="15.5" r="3.6"/><path d="m10.6 12.9 8.4-8.4M16.4 7.1l2.4 2.4M18.9 4.6l2.4 2.4"/></svg> LS Key</span></label>
+      <label><input type="radio" name="keyMode" value="sub" /><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="width:13px;height:13px"><path d="M3.5 8.5A2 2 0 0 1 5.5 6.5h13a2 2 0 0 1 2 2V10a2 2 0 0 0 0 4v1.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V14a2 2 0 0 0 0-4z"/><path d="M12 9v6" stroke-dasharray="2 2"/></svg> SUB Voucher</span></label>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="keyInput">Key / voucher code</label>
+      <input id="keyInput" class="input" type="text" placeholder="LS-XXXXXX ya SUB-XXXX" autocomplete="off" spellcheck="false" autofocus />
+    </div>
+    <button id="activateBtn" class="btn btn-blood btn-block">Activate karo</button>
+    <p id="gateMsg" class="msg"></p>
+
+    <div class="dialog-foot">
+      <button class="link-btn" id="clearKeyBtn">Is device ki key hatao</button>
+      <a class="link-btn" href="index.html" id="reloadLink">Refresh</a>
+    </div>
+
+    <button id="adminToggle" class="admin-toggle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 18h18M4.5 18 2.6 8.2l5.4 3.4L12 4.5l4 7.1 5.4-3.4L19.5 18"/></svg>
+      Admin panel
+    </button>
+
+    <div id="adminBox" class="admin-box hidden">
+      <p class="msg info" style="margin-top:0">Wo password daalo jo server pe <b>ADMIN_PASS</b> set hai.</p>
+      <div class="admin-row">
+        <input id="adminPassInput" type="password" placeholder="Admin password" class="input" autocomplete="off" />
+        <button id="adminUnlockBtn" class="btn btn-ghost btn-sm" style="height:46px">Unlock</button>
+      </div>
+      <p id="adminMsg" class="msg"></p>
+
+      <div id="adminStats" class="hidden">
+        <div class="stat-grid">
+          <div class="stat-cell"><span class="n" id="statTotal">0</span><span class="l">Total keys</span></div>
+          <div class="stat-cell"><span class="n" id="statUsed">0</span><span class="l">Used</span></div>
+          <div class="stat-cell"><span class="n" id="statAvail">0</span><span class="l">Bachi</span></div>
+          <div class="stat-cell"><span class="n" id="statExpired">0</span><span class="l">Expired</span></div>
+        </div>
+        <p id="adminViews" class="msg info hidden" style="margin-top:0"></p>
+
+        <h3 class="admin-title">Naya key banao</h3>
+        <div class="admin-row">
+          <input id="noteInput" type="text" placeholder="Note (kis batch / kaun)" class="input" />
+          <select id="daysSelect" class="select" style="flex:0 1 170px">
+            <option value="30">1 mahina</option>
+            <option value="90">3 mahine</option>
+            <option value="180">6 mahine</option>
+            <option value="365">1 saal</option>
+            <option value="0">Lifetime</option>
+          </select>
+        </div>
+        <div class="admin-row" style="margin-top:8px">
+          <button id="genKeyBtn" class="btn btn-ember btn-sm" style="flex:1">Generate key</button>
+          <button id="exportBtn" class="btn btn-ghost btn-sm" style="flex:1">CSV export</button>
+        </div>
+        <p id="genMsg" class="msg"></p>
+
+        <h3 class="admin-title">Saari keys</h3>
+        <div class="table-scroll">
+          <table class="data">
+            <thead><tr><th>Key</th><th>Note</th><th>Email</th><th>Status</th><th>Din</th><th>Expiry</th><th></th></tr></thead>
+            <tbody id="keylistBody"><tr><td colspan="7" class="msg info" style="text-align:center">Unlock karke dekho…</td></tr></tbody>
+          </table>
+        </div>
+
+        <h3 class="admin-title">Redeem requests</h3>
+        <div class="table-scroll">
+          <table class="data">
+            <thead><tr><th>REF</th><th>Email</th><th>Pack</th><th>Price</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="reqBody"><tr><td colspan="6" class="msg info" style="text-align:center">Unlock karke dekho…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ PREMIUM OFFER DIALOG ============================ -->
+<div id="offerOverlay" class="overlay hidden">
+  <div class="dialog glass-edge" role="dialog" aria-modal="true" aria-labelledby="offerTitle">
+    <button class="dialog-x" data-close="offerOverlay" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="dialog-brand" id="offerBrand"></div>
+    <h2 class="dialog-title" id="offerTitle">Ye lecture <em>sealed</em> hai</h2>
+    <p class="dialog-sub">Pehle kuch lectures <b>free preview</b> hain. Baaki ke liye ek pack lo — offline cash ya UPI se, koi auto-renewal nahi.</p>
+
+    <div class="field">
+      <label class="field-label" for="tierSelect">Pack chuno</label>
+      <select id="tierSelect" class="select"></select>
+    </div>
+    <div class="tier-price" id="tierPrice"></div>
+
+    <div class="field">
+      <label class="field-label" for="offerEmail">Email (key yahin aayegi)</label>
+      <input id="offerEmail" type="email" placeholder="you@example.com" class="input" autocomplete="email" />
+    </div>
+    <button id="offerBtn" class="btn btn-blood btn-block">Request karo</button>
+    <p id="offerMsg" class="msg"></p>
+
+    <div id="offerResult" class="ref-box hidden">
+      <p class="ref-label">Tumhara reference code</p>
+      <p class="ref-code" id="offerRef">—</p>
+      <p class="msg info" style="margin-top:10px">Ye code admin ko dikhao + cash do. Mark-paid hote hi activation key email pe aa jayegi.</p>
+    </div>
+
+    <div class="dialog-foot">
+      <button class="link-btn" id="haveKeyLink">Key already hai? Activate</button>
+      <button class="link-btn" data-close="offerOverlay">Band karo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ COMMAND PALETTE ============================ -->
+<div id="paletteOverlay" class="overlay palette-overlay hidden">
+  <div class="palette" role="dialog" aria-modal="true" aria-label="Command palette">
+    <div class="palette-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <input id="paletteInput" placeholder="Lecture dhoondo, ya command likho…" autocomplete="off" spellcheck="false" />
+      <kbd>esc</kbd>
+    </div>
+    <div class="palette-list" id="paletteList"></div>
+    <div class="palette-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> open</span>
+      <span><kbd>esc</kbd> band</span>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
